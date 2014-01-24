@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -138,7 +139,7 @@ public class MinSpanningTree {
 		}
 		LinkedList<Street> mst = new LinkedList<Street>();
 		LinkedList<IntersectionComp> vertexTree = new LinkedList<IntersectionComp>();
-		BinaryMinHeapI<IntersectionComp> pq = new JavaPQ<IntersectionComp>();
+		PriorityQueue<IntersectionComp> pq = new PriorityQueue<IntersectionComp>();
 		HashMap<Point, IntersectionComp> intmap = new HashMap<Point, IntersectionComp>();
 		
 		for (Point p : map.keySet()) {
@@ -153,10 +154,10 @@ public class MinSpanningTree {
 		vertexTree.add(intmap.get(p));
 		intmap.get(p).visit();
 		IntersectionComp first = new IntersectionComp(p, map.get(p));
-		pq.insert(first);
+		pq.add(first);
 
 		while (!pq.isEmpty()) {
-			IntersectionComp i = pq.removeMin();
+			IntersectionComp i = pq.poll();
 			if (i.edgeTo != null) {
 				mst.add(i.edgeTo);
 			}
@@ -178,7 +179,7 @@ public class MinSpanningTree {
 				//mark and insert into priority queue if it hasn't been seen
 				if (!adj.visited) {
 					adj.setStreetTo(s);
-					pq.insert(adj);
+					pq.add(adj);
 					adj.visit();
 				} else {
 					
@@ -186,7 +187,9 @@ public class MinSpanningTree {
 					if (s.getDistance() < adj.weight && !vertexTree.contains(adj)) {
 						//create copy of new node with smaller edge
 						adj.setStreetTo(s);
-						pq.updateKey(adj, adj);
+						//update key
+						pq.remove(adj);
+						pq.add(adj);
 
 					}
 

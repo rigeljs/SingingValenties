@@ -15,10 +15,17 @@ public class MinSpanningTree {
 
 	public List<Point> travelingSalesman(Map<Point, List<Street>> map, Point platt){
 		List<Street> mst = minST(map);
-		this.platt = platt;
 		for (Street s : mst) {
-			//find Platt
+			if (s.getFirstPoint().getName().equals("Platt Student Performing Arts House")){
+				platt = s.getFirstPoint();
+				break;
+			}
 		}
+		if (platt == null) {
+			System.out.println("Map must include Platt");
+			System.exit(1);
+		}
+		this.platt = platt;
 		HashSet<Point> discovered = new HashSet<Point>();
 		Stack<Point> dfsStack = new Stack<Point>();
 		

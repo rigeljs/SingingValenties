@@ -5,13 +5,18 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 public class RouteCreator {
 
-	HashMap<String, Point> mapNames;
-	HashMap<Point,List<Street>> map;
+	Map<String, Point> mapNames;
+	Map<Point,List<Street>> map;
+	
+	public RouteCreator(String mapFilename, String routeFilename) {
+		this.map = mapToPoints(parseMap(mapFilename));
+	}
 
 	public HashMap<String, Double[]> parseMap(String filename) {
 		HashMap<String, Double[]> mapTokens = new HashMap<String, Double[]>();
@@ -36,7 +41,7 @@ public class RouteCreator {
 		return mapTokens;
 	}
 	
-	public void mapToPoints(HashMap<String, Double[]> mapTokens) {
+	public Map<Point, List<Street>> mapToPoints(HashMap<String, Double[]> mapTokens) {
 		HashMap<Point, List<Street>> map = new HashMap<Point, List<Street>>();
 		for (String name : mapTokens.keySet()) {
 			Point p = new Point(mapTokens.get(name)[0],mapTokens.get(name)[1], name);
@@ -52,7 +57,7 @@ public class RouteCreator {
 			}
 			map.put(p, streets);
 		}
-		this.map = map;
+		return map;
 	}
 	
 	public Set<List<Point>> createRoutes(List<String> routeNames) {
@@ -76,7 +81,8 @@ public class RouteCreator {
 	}
 
 	public static void main(String[] args) {
-		RouteCreator m = new RouteCreator();
+		RouteCreator r = new RouteCreator(args[0],args[1]);
+		r.parseMap(args[0]);
 
 	}
 }

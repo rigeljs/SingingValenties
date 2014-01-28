@@ -12,10 +12,14 @@ import java.util.Stack;
 public class RouteCreator {
 
 	Map<String, Point> mapNames;
+	List<String> routeNames;
 	Map<Point,List<Street>> map;
+	int numGroups;
 	
 	public RouteCreator(String mapFilename, String routeFilename) {
 		this.map = mapToPoints(parseMap(mapFilename));
+		this.routeNames = parseRoute(routeFilename);
+		
 	}
 
 	public HashMap<String, Double[]> parseMap(String filename) {
@@ -35,10 +39,32 @@ public class RouteCreator {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("Incorrect map filename");
+			System.exit(1);
 		} catch (IOException e) {
-			System.out.println("Incorrect map filename");
+			System.out.println("Improperly formatted map file");
+			System.exit(1);
 		}
 		return mapTokens;
+	}
+	
+	public List<String> parseRoute(String filename) {
+		LinkedList<String> route = new LinkedList<String>();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			numGroups = Integer.parseInt(reader.readLine());
+			while (reader.ready()) {
+				String line = reader.readLine();
+				route.add(line);
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Incorrect route filename");
+			System.exit(1);
+		} catch (IOException e) {
+			System.out.println("Improperly formatted route file");
+			System.exit(1);
+		}
+		return route;
 	}
 	
 	public Map<Point, List<Street>> mapToPoints(HashMap<String, Double[]> mapTokens) {
@@ -59,8 +85,8 @@ public class RouteCreator {
 		}
 		return map;
 	}
-	
-	public Set<List<Point>> createRoutes(List<String> routeNames) {
+		
+	public Set<List<Point>> createRoutes() {
 		HashMap<Point, List<Street>> routeMap = new HashMap<Point,List<Street>>();
 		for (String name : routeNames) {
 			if (!map.containsKey(name)) {
@@ -75,14 +101,21 @@ public class RouteCreator {
 		MinSpanningTree.minST(routeMap);
 		List<Point> minTotalRoute = m.travelingSalesman(routeMap,
 				mapNames.get("Platt Student Performing Arts House"));
-		m.splitPath(1, minTotalRoute, new Stack<List<Point>>());
+		m.splitPath(numGroups, minTotalRoute, new Stack<List<Point>>());
 		Set<List<Point>> bestSplit = m.getBestSplit();
 		return bestSplit;
 	}
 
 	public static void main(String[] args) {
 		RouteCreator r = new RouteCreator(args[0],args[1]);
-		r.parseMap(args[0]);
+		Set<List<Point>> allRoutes = r.createRoutes();
+		int i = 0;
+		for (List<Point> l : allRoutes) {
+			System.out.println("Route " + i + ":");
+			for (Point p : l) {
+				System.out.println(p.getName());
+			}
+		}
 
 	}
 }

@@ -3,7 +3,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Stack;
@@ -13,18 +12,10 @@ public class MinSpanningTree {
 	Set<Set<List<Point>>> allSplits = new HashSet<Set<List<Point>>>();
 	Point platt; 
 
+
 	public List<Point> travelingSalesman(Map<Point, List<Street>> map, Point platt){
 		List<Street> mst = minST(map);
-		for (Street s : mst) {
-			if (s.getFirstPoint().getName().equals("Platt Student Performing Arts House")){
-				platt = s.getFirstPoint();
-				break;
-			}
-		}
-		if (platt == null) {
-			System.out.println("Map must include Platt");
-			System.exit(1);
-		}
+
 		this.platt = platt;
 		HashSet<Point> discovered = new HashSet<Point>();
 		Stack<Point> dfsStack = new Stack<Point>();
@@ -37,14 +28,13 @@ public class MinSpanningTree {
 			if (!discovered.contains(p)) {
 				discovered.add(p);
 				path.add(p);
-				for (Street s : map.get(p)) {
+				for (Street s : mst) {
+					if (s.getFirstPoint().equals(p) || s.getSecondPoint().equals(p))
 						dfsStack.push(getOpposite(p,s));
 				}
 			}
 		}
-		
-		//remove platt
-		return path.subList(1, path.size() - 1);
+		return path.subList(1, path.size());
 	}
 	
 	public void splitPath(int n, List<Point> original, Stack<List<Point>> allSt) {
@@ -68,7 +58,6 @@ public class MinSpanningTree {
 		
 		Set<List<Point>> best = null;
 		double minVariance = Double.POSITIVE_INFINITY;
-		System.out.println(allSplits.size());
 		for (Set<List<Point>> split : allSplits) {
 			double[] data = new double[split.size()];
 			int i = 0;
@@ -78,22 +67,17 @@ public class MinSpanningTree {
 				Point prev = platt;
 				double time = 0;
 				for (Point p : withPlatt) {
+					double prevtime = time;
 					//5 min per valentine
 					time += 2;
 					//find time to get between points
 					double dist = gps2m(prev.getX(), prev.getY(), p.getX(), p.getY());
-					//System.out.println(prev.getName() + " to "  + p.getName() + ": " + dist);
 					//avg people walk at 5 km/h
 					time += dist * 5;
 					prev = p;
 				}
 				data[i] = time;
 				withPlatt.add(platt);
-				for (Point p : withPlatt) {
-					System.out.println(p.getName());
-				}
-				System.out.println("Total time:" + data[i]);
-				System.out.println("-----");
 				i++;
 			}
 			double variance = getVariance(data);

@@ -13,9 +13,9 @@ public class MinSpanningTree {
 	Set<Set<List<Point>>> allSplits = new HashSet<Set<List<Point>>>();
 	Point platt; 
 
-	public List<Point> travelingSalesman(Map<Point, List<Street>> map){
+	public List<Point> travelingSalesman(Map<Point, List<Street>> map, Point platt){
 		List<Street> mst = minST(map);
-		Point platt = null;
+		this.platt = platt;
 		for (Street s : mst) {
 			//find Platt
 		}

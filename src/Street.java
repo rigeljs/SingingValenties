@@ -8,30 +8,10 @@
 public class Street {
     
 	private Point firstPoint, secondPoint;
-	private String name;
-	private int id;
     
-	public Street(int id, Point firstPoint, Point secondPoint, String name) {
-		this.id = id;
+	public Street(Point firstPoint, Point secondPoint) {
 		this.firstPoint = firstPoint;
 		this.secondPoint = secondPoint;
-		this.name = name;
-	}
-    
-	public void setId(int id) {
-		this.id = id;
-	}
-    
-	public int getId() {
-		return id;
-	}
-    
-	public void setName(String name) {
-		this.name = name;
-	}
-    
-	public String getName() {
-		return name;
 	}
     
 	public void setPoints(Point firstPoint, Point secondPoint) {

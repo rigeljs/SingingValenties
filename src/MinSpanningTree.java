@@ -68,23 +68,32 @@ public class MinSpanningTree {
 		
 		Set<List<Point>> best = null;
 		double minVariance = Double.POSITIVE_INFINITY;
+		System.out.println(allSplits.size());
 		for (Set<List<Point>> split : allSplits) {
 			double[] data = new double[split.size()];
 			int i = 0;
 			for (List<Point> path : split) {
 				//add platt to end of path
-				path.add(platt);
+				LinkedList<Point> withPlatt = new LinkedList<Point>(path);
 				Point prev = platt;
 				double time = 0;
-				for (Point p : path) {
+				for (Point p : withPlatt) {
 					//5 min per valentine
-					time += 5;
+					time += 2;
 					//find time to get between points
 					double dist = gps2m(prev.getX(), prev.getY(), p.getX(), p.getY());
+					//System.out.println(prev.getName() + " to "  + p.getName() + ": " + dist);
 					//avg people walk at 5 km/h
 					time += dist * 5;
+					prev = p;
 				}
 				data[i] = time;
+				withPlatt.add(platt);
+				for (Point p : withPlatt) {
+					System.out.println(p.getName());
+				}
+				System.out.println("Total time:" + data[i]);
+				System.out.println("-----");
 				i++;
 			}
 			double variance = getVariance(data);
@@ -182,7 +191,6 @@ public class MinSpanningTree {
 				//get adjacent node
 				Point oppPt = MinSpanningTree.getOpposite(i.getLocation(), s);
 				IntersectionComp adj = intmap.get(oppPt);
-				
 				//mark and insert into priority queue if it hasn't been seen
 				if (!adj.visited) {
 					adj.setStreetTo(s);

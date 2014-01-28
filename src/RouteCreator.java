@@ -12,14 +12,14 @@ import java.util.Stack;
 public class RouteCreator {
 
 	Map<String, Point> mapNames;
-	List<String> routeNames;
+	Map<String, Point> routeNames;
 	Map<Point,List<Street>> map;
 	int numGroups;
 	
 	public RouteCreator(String mapFilename, String routeFilename) {
+		mapNames = new HashMap<String, Point>();
 		this.map = mapToPoints(parseMap(mapFilename));
 		this.routeNames = parseRoute(routeFilename);
-		
 	}
 
 	public HashMap<String, Double[]> parseMap(String filename) {
@@ -47,26 +47,6 @@ public class RouteCreator {
 		return mapTokens;
 	}
 	
-	public List<String> parseRoute(String filename) {
-		LinkedList<String> route = new LinkedList<String>();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			numGroups = Integer.parseInt(reader.readLine());
-			while (reader.ready()) {
-				String line = reader.readLine();
-				route.add(line);
-			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Incorrect route filename");
-			System.exit(1);
-		} catch (IOException e) {
-			System.out.println("Improperly formatted route file");
-			System.exit(1);
-		}
-		return route;
-	}
-	
 	public Map<Point, List<Street>> mapToPoints(HashMap<String, Double[]> mapTokens) {
 		HashMap<Point, List<Street>> map = new HashMap<Point, List<Street>>();
 		for (String name : mapTokens.keySet()) {
@@ -85,17 +65,54 @@ public class RouteCreator {
 		}
 		return map;
 	}
+	
+	public Map<String, Point> parseRoute(String filename) {
+		HashMap<String, Point> route = new HashMap<String, Point>();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			numGroups = Integer.parseInt(reader.readLine());
+			while (reader.ready()) {
+				String line = reader.readLine();
+				if (mapNames.get(line) == null) {
+					System.out.println("Location \"" + mapNames.get(line)
+							+ "\" not found in map. Continuing with " +
+							"other locations.");
+					continue;
+				}
+				route.put(line.trim(), mapNames.get(line));
+				
+			}
+			reader.close();
+			route.put("Platt Student Performing Arts House", 
+					mapNames.get("Platt Student Performing Arts House"));
+		} catch (FileNotFoundException e) {
+			System.out.println("Incorrect route filename");
+			System.exit(1);
+		} catch (IOException e) {
+			System.out.println("Improperly formatted route file");
+			System.exit(1);
+		}
+		return route;
+	}
+	
 		
 	public Set<List<Point>> createRoutes() {
 		HashMap<Point, List<Street>> routeMap = new HashMap<Point,List<Street>>();
-		for (String name : routeNames) {
-			if (!map.containsKey(name)) {
-				System.out.println("Location \"" + name + "\" not found in map. Continuing with " +
-						"other locations.");
-				continue;
+		
+		for (Point p : routeNames.values()) {
+			LinkedList<Street> streets = new LinkedList<Street>();
+			for (Point other : routeNames.values()) {
+				if (other == p) continue;
+				Street s = new Street(p, other);
+				streets.add(s);
+				List<Street> oppList = routeMap.get(other);
+				if (oppList == null) {
+					oppList = new LinkedList<Street>();
+				}
+				oppList.add(s);
+				routeMap.put(other, oppList);
 			}
-			routeMap.put(mapNames.get(name), map.get(name));
-			
+			routeMap.put(p, streets);
 		}
 		MinSpanningTree m = new MinSpanningTree();
 		MinSpanningTree.minST(routeMap);
@@ -115,6 +132,7 @@ public class RouteCreator {
 			for (Point p : l) {
 				System.out.println(p.getName());
 			}
+			i++;
 		}
 
 	}

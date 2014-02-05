@@ -70,16 +70,24 @@ public class RouteCreator {
 		HashMap<String, Point> route = new HashMap<String, Point>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			numGroups = Integer.parseInt(reader.readLine());
+			numGroups = Integer.parseInt(reader.readLine().split(",")[0]);
 			while (reader.ready()) {
 				String line = reader.readLine();
-				if (mapNames.get(line) == null) {
-					System.out.println("Location \"" + mapNames.get(line)
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				if (tokens[0].charAt(0) == '"') {
+					tokens[0] = tokens[0].substring(1, tokens[0].length() - 1);
+				}
+				Point curr = mapNames.get(tokens[0]);
+				if (curr == null) {
+					System.out.println("Location \"" + tokens[0]
 							+ "\" not found in map. Continuing with " +
 							"other locations.");
 					continue;
 				}
-				route.put(line.trim(), mapNames.get(line));
+				if (tokens.length > 1) {
+					curr.addSpecificLocation(tokens[1]);
+				}
+				route.put(tokens[0], curr);
 				
 			}
 			reader.close();
@@ -126,12 +134,21 @@ public class RouteCreator {
 	public static void main(String[] args) {
 		RouteCreator r = new RouteCreator(args[0],args[1]);
 		Set<List<Point>> allRoutes = r.createRoutes();
-		int i = 0;
+		int i = 1;
+		System.out.println("--------");
 		for (List<Point> l : allRoutes) {
 			System.out.println("Route " + i + ":");
 			for (Point p : l) {
-				System.out.println(p.getName());
+				System.out.print(p.getName());
+				if (p.getSpecificLocations().size() > 0) { 
+					System.out.print(" : ");
+				}
+				for (String s : p.getSpecificLocations()) {
+					System.out.print(s + ", ");
+				}
+				System.out.println();
 			}
+			System.out.println("--------");
 			i++;
 		}
 

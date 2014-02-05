@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * For this assignment you can assume that every point denotes essentially an
  * intersection. More precisely, the location of an intersection is a point, and
@@ -10,6 +13,7 @@
 public class Point {
 	private double x, y;
     private String name;
+    private List<String> specificLocations;
 	/**
 	 * Constructor for a Point that accepts arguments for all fields.
 	 */
@@ -17,8 +21,17 @@ public class Point {
 		this.x = x;
 		this.y = y;
 		this.name = name;
+		this.specificLocations = new LinkedList<String>();
 	}
     
+	public void addSpecificLocation(String location) {
+		specificLocations.add(location);
+	}
+	
+	public List<String> getSpecificLocations() {
+		return specificLocations;
+	}
+	
 	public double getX() {
 		return x;
 	}

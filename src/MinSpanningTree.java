@@ -67,9 +67,10 @@ public class MinSpanningTree {
 				Point prev = platt;
 				double time = 0;
 				for (Point p : withPlatt) {
-					double prevtime = time;
-					//5 min per valentine
-					time += 2;
+					//3 min per valentine
+					time += 3;
+					//take multiple valentines at same location into account
+					time += 2 * (p.getSpecificLocations().size() - 1);
 					//find time to get between points
 					double dist = gps2m(prev.getX(), prev.getY(), p.getX(), p.getY());
 					//avg people walk at 5 km/h
